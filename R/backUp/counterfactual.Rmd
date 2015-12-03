@@ -1,0 +1,197 @@
+---
+title: "Albacore MSE"
+subtitle: "Counterfactual"
+author: "Laurie"
+date: "05/04/2015"
+output: html_document
+---
+
+```{r, echo=FALSE}
+library(knitr)
+
+opts_chunk$set(comment=NA, fig.width =8, 
+                           fig.height=6,
+                           fig.path  ="../tex/",
+                           warning=FALSE, 
+                           message=FALSE, 
+                           error  =FALSE, 
+                           echo   =FALSE,
+                           cache  =!FALSE)
+```
+
+```{r}
+library(FLBRP)
+library(FLash)
+library(biodyn)
+
+library(RSQLite)
+library(DBI)
+
+library(reshape)
+library(diags)
+
+source('~/Desktop/MEGA/papers/submitted/tuna-mse/R/biodyn-tseries.R')
+source('~/Desktop/MEGA/papers/submitted/tuna-mse/resubmission/R/runMSE.R')
+source('~/Desktop/MEGA/papers/submitted/tuna-mse/R/rand-noise.R')
+source('~/Desktop/MEGA/papers/submitted/tuna-mse/R/biodyn-prior.R')
+source('~/Desktop/MEGA/papers/submitted/tuna-mse/R/biodyn-hcr.R')
+
+dirDat='~/Desktop/MEGA/papers/submitted/tuna-mse/data'
+dirRes='~/Desktop/MEGA/papers/submitted/tuna-mse/resubmission/data'
+
+load(paste(dirDat,"/BRPs.RData",   sep=""))
+load(paste(dirDat,"/omKey.RData",  sep=""))
+
+## OM
+options=list(OM =rbind(data.frame(i=as.numeric(names(omKey)),ar=0.0),
+                       data.frame(i=21,                      ar=0.5)))
+
+## HCRs
+options$HCR =expand.grid(ftar=c(.5,.75),blim=c(.3,.4),btrig=c(0.6,0.8))
+
+## SA
+options$SA =rbind(data.frame(p=1,prr=c("None","r","k","fmsy","bmsy"),
+                             stringsAsFactors=FALSE),
+                  data.frame(p=2,prr=c("None","r","k","fmsy"),       
+                             stringsAsFactors=FALSE))
+
+nits =100; set.seed(7890)
+
+tseriesFn=function(stk){
+  
+  model.frame(FLQuants(
+               stock  =stock(stk),
+               ssb    =ssb(  stk),
+               rec    =rec(  stk),
+               catch  =catch(stk),
+               fbar   =fbar( stk),
+               harvest=(catch(stk))),drop=TRUE)}
+
+simCounter=function(eql,f,srDev){
+  
+  cat("",f)
+  
+  fbar(eql)  =FLQuant(c(FLBRP:::refpts(eql)["msy","harvest"])*f,
+                      dimnames=list(year=1:75))
+  eql=brp(eql)
+  res=fwd(eql)
+  harvest(res)=rlnorm(dim(srDev)[6],log(harvest(res)),0.3)
+  units(harvest(res))="f"
+  apex=c(ages(catch.sel(eql))[catch.sel(eql)==c(fapex(catch.sel(eql)))])
+  range(res)[c("minfbar","maxfbar")]=apex
+  res=fwd(res,f=fbar(res)[,-1],sr=eql,sr.residuals=srDev)
+
+  tseriesFn(res[,26:75])}
+```
+
+```{r-cFact,eval=FALSE}
+set.seed(7890)
+srDev=rlnorm(nits,FLQuant(0,dimnames=list(year=1:75)),0.3)
+
+library(doParallel)
+library(foreach)
+
+cl=makeCluster(4)
+registerDoParallel(cl)
+
+cFact<-foreach (i=names(omKey),
+              .combine     =rbind,
+              .multicombine=TRUE,
+              .maxcombine  =8,
+              .packages    =c("plyr","FLash","FLCore","FLBRP")) %dopar%{
+  cbind(om=i,mdply(data.frame(f=seq(0,3,length.out=51)),function(f)
+           simCounter(BRPs[[i]],f,srDev=srDev)))}
+
+save(cFact,file=paste(dirRes,"cFact.RData",sep="/"))
+
+set.seed(7890)
+srDev  =exp(lh:::noise(nits,FLQuant(1,dimnames=list(year=1:75)),b=0.3,0.3))
+cFactAR=mdply(data.frame(f=seq(0,3,length.out=51)),function(f)
+           simCounter(BRPs[[21]],f,srDev=srDev))
+
+cFact=rbind(cbind(ar=0,        cFact),
+            cbind(ar=0.3,om=21,cFactAR))
+
+save(cFact,file=paste(dirRes,"cFact.RData",sep="/"))
+```
+
+```{r}
+load(paste(dirRes,"cFact.RData",sep="/"))
+
+rfs=ldply(BRPs[names(omKey)], function(x) 
+  as.data.frame(FLBRP:::refpts(x)[c("msy","virgin"),   
+                                  c("ssb","rec","yield","harvest")]))
+
+rfs=cast(rfs,.id~quantity~refpt,value="data")
+
+dat=transform(cFact,
+        fMSY    = f,
+        harvest = catch/stock,
+        f       = f*rfs[om,"harvest",  "msy"],
+        yieldMSY= catch/rfs[om,"yield","msy"],
+        recVir  = rec/rfs[om,"rec",  "virgin"],
+        green   = ifelse(ssb/rfs[om,"ssb",  "msy"]>1&f<1,1,0),
+        ssbMSY  = ifelse(ssb/rfs[om,"ssb",  "msy"]>1,1,0),
+        ssbLRP  = ifelse(ssb/(rfs[om,"ssb",  "msy"]*.4)>1,1,0),
+        ssbLRP2 = ifelse(ssb/(rfs[om,"ssb",  "virgin"]*.2)>1,1,0))
+```
+
+```{r}
+dat2=ddply(dat,
+           .(ar,om,fMSY),with,
+            data.frame(green  =mean(   green, na.rm=TRUE),
+                       ssbMSY =mean(  ssbMSY, na.rm=TRUE),
+                       ssbLRP =mean(  ssbLRP, na.rm=TRUE),
+                       ssbLRP2=mean(  ssbLRP2,na.rm=TRUE),
+                       catch  =mean(catch,na.rm=TRUE),
+                       ssb    =mean(ssb,  na.rm=TRUE)))
+
+ggplot(dat2)+
+  geom_path(aes(catch,green,col=factor(ar)))+
+  geom_point(aes(catch,green,col=factor(ar)))+
+  facet_grid(om~.)
+```
+
+
+```{r}
+dat2=ddply(dat,
+           .(fMSY),with,
+            data.frame(green  =mean(   green, na.rm=TRUE),
+                       ssbMSY =mean(  ssbMSY, na.rm=TRUE),
+                       ssbLRP =mean(  ssbLRP, na.rm=TRUE),
+                       ssbLRP2=mean(  ssbLRP2,na.rm=TRUE),
+                       catch  =mean(catch,na.rm=TRUE),
+                       ssb    =mean(ssb,  na.rm=TRUE)))
+
+ggplot(dat2)+
+  geom_path(aes(catch,green))+
+  geom_point(aes(catch,green))
+```
+
+```{r}
+dat2=ddply(cFact[,c("om","f","catch","ssb")],
+           .(om,f),with,
+              data.frame(ssb  =mean(ssb,  na.rm=TRUE),
+                         catch=mean(catch,na.rm=TRUE),
+                         av   =diags:::av(catch))) 
+
+ggplot(subset(dat2,f<2))+
+  geom_line(aes(f,av,col=paste(om)))
+```
+
+```{r}
+dat=ddply(cFact,
+          .(om,f),with,data.frame(
+              recVir   = mean(rec/rfs[om,"rec",  "virgin"]),
+              ssbMSY   = mean(ifelse(ssb/rfs[om,"ssb",  "msy"]>1,1,0)),
+              ssbLRP   = mean(ifelse(ssb/(rfs[om,"ssb",  "msy"]*.4)>1,1,0)),
+              ssbLRP2  = mean(ifelse(ssb/(rfs[om,"ssb",  "virgin"]*.2)>1,1,0))))
+
+dat=melt(dat[,-2],id=c("om","recVir"))
+
+ggplot(dat)+
+  geom_line(aes(1-value,recVir,col=om))+
+  facet_grid(variable~.)+
+  xlab(expression(Rec/Virgin))+
+  ylab("P()")
+```
