@@ -1,0 +1,158 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+
+\usepackage[authoryear, round]{natbib}
+
+\usepackage{color}
+\newcommand{\red}{\textcolor{red}}
+
+\begin{document}
+
+
+\section*{Response}
+
+Reframing Stock Assessment As Risk Management; An Management Strategy Evaluation for North Atlantic Tuna
+
+\subsection*{Associate Editor Comments}
+
+This manuscript presents a Management Strategy Evaluation of North Atlantic albacore apparently (though not at all clear in the title, abstract, and Introduction). 
+ \begin{itemize}
+    \item  \red{We have now changed the title to make the content of the paper clearer.}
+  \end{itemize}
+
+The authors frame their work as a new approach by (re)defining the term stock assessment based on a personal communication by “Holt” as if the readers would be able to identify the person. 
+ \begin{itemize}
+    \item  \red{We apologise, we thought that Sidney Holt would be easily identifiable to the reader, we now do not use the pers comm.}
+  \end{itemize}
+ 
+
+Two competent referees attempted to review the manuscript but were unable to, because they found it was poorly written. Referee 1 elaborated on work that the authors did not cite and the limitation of the methodology in terms of using an accurate precise CPUE from the fishery for the stock assessment indicator. 
+ \begin{itemize}
+    \item  \red{We accept the criticism that the manuscript was poorly written and we now feel we have now fully addressed this.}
+    
+    \item  \red{The Mangel et al reference was an important one that we missed and by including it in the discussion helps emphasises the value of the study}
+    
+    \item  \red{The methodology used to develop the CPUE in the simulation model for use in the estimation model is now fully described and justified.}
+  \end{itemize}
+ 
+ Referee 2 was pretty harsh in his/her comments, but provided several ways in which the manuscript was deficient. 
+  \begin{itemize}
+    \item  \red{We welcome the comments of both reviewers and hopefully have fully addressed them, see below.}
+  \end{itemize}
+ 
+ However, both referees thought that the manuscript was of broad interest with important scientific findings.
+ \begin{itemize}
+    \item  \red{See below}
+  \end{itemize}
+ 
+After perusing the manuscript, I have to agree with the referees about the conclusion that this manuscript is not ready for review. The manuscript is written as a primer about doing a Management Strategy Evaluation as if there have not been at least 100 papers written on the subject.  \begin{itemize}
+    \item  \red{It is not a primer but an application that we believe advances the state-of-the art. In particular will help both the tuna RFMOs and other more fully consider uncertainty when providing advice and to include stakeholders more fully in the process. This is supported by reviewer 2 who believed it is an important piece of work that can add a lot to the field.}
+  \end{itemize}
+ 
+ The presentation of the operating model does not contain sufficient motivation for the choices of factors examined. 
+  \begin{itemize}
+    \item  \red{Now justified, The design is factorial intended to allow an experimental approach to be taken, based on the beliefs of the ICCAT Scientific Committee on what uncertainties are important to consider when providing advice. We have also included others based on previous exercises to engage stakeholders in ICCAT. The intention is to provide an example of a design can be used to identify the main scenarios that should be included in an MSE; this will be important in the move from stock assessment, where traditionally only a few scenarios are considered, to MSE where a wider range of uncertainties are included. Namely to identify which scenarios can be assigned lower weights.}
+  \end{itemize}
+  
+ The manuscript appears to be a case study with limited novelty. Their contention that they are providing a brand-new approach is not credible.
+ \begin{itemize}
+    \item  \red{"Both referees thought that the manuscript was of broad interest with important scientific findings", see above. They also stated "I think this/w is a worthy manuscript", "I like the concept of this paper", "I believe it is an important piece of work that can add a lot to the field". We therefore feel the paper is important as long as the presentation is improved and the issues raised are addressed.}
+    
+     \red{It is also an example for the Tuna RFMOs, that hopefully will allow a transition from traditionally to risk based advice.}
+  \end{itemize}
+ 
+If the authors can carefully reconstruct their paper to be a research contribution, then this work may be suitable for CJFAS. To do so, the authors will need to change the focus, the writing, the factors considered, and more carefully review the literature.  
+
+\begin{itemize}
+    \item  \red{We have added the missing reference and refer to the relevant reviews of the use of MSE and show how the work is important based on a review of the advice framework of the tRFMOs and their move towards MSE. We also highlight the importance for other RFMOs and management bodies}
+  \end{itemize}
+ 
+ The amount of jargon is overwhelming, so the authors should attempt to make this of more general interest.  \begin{itemize}
+    \item  \red{We base all our terminology on the standard reference of \cite[][]{rademeyer2007tips}.}
+  \end{itemize}
+  
+ The most important thing is to have a more realistic estimation model.
+ \begin{itemize}
+    \item  \red{The estimation model is that used for 80\% of the stocks managed by ICCAT. It is therefore important that it is simulation tested and the methods used to do this are subject to peer review. The main criticism of reviewer 1 was not with respect to the estimation model but the how the CPUE data used was simulated. The inclusion of CPUE series in estimation models is addressed in the response to reviewer 1. It is based on the \cite{hillary2015scientific} and the albacore stock assessment analysis.} 
+  \end{itemize}
+ 
+
+\subsection*{Reviewer: 1}
+
+I like the concept of this paper however I find that it needs some substantial editing before it is ready. 
+
+
+\begin{enumerate}
+ \item I do not have time to attempt that editing on a pdf that is single-spaced and without line numbers.
+  \begin{itemize}
+    \item \red{Double spaced with line numbers}
+  \end{itemize}
+ \item  the equations presented are very standard and can be in an appendix
+  \begin{itemize}
+    \item \red{Moved to the appendix}
+  \end{itemize}
+
+ \item  the mismatch between the age-structured OM and the biomass dynamics EM is related to the form of the stock-recruitment curve, as you state.  This has been investigated in Mangel et al in:  Canadian Journal of Fisheries and Aquatic Sciences, 2013, 70(6): 930-940, 10.1139/cjfas-2012-0372.
+  \begin{itemize}
+    \item \red{The Mangel et al reference was an important one that we missed and by including it in the discussion helps emphasises the importance of our findings.}
+  \end{itemize}
+
+ \item while you investigate various ways in which structural error can cause bias, all of this work uses the stock abundance indicator as CPUE with a CV of 30\%.  Why would anyone ever want to spend money of a fishery-independent survey of stock abundance if they had a perfectly calibrated fishery CPUE with a CV of only 30\%?  The problem is that your analysis admits to no possibility of structural error in the CPUE such as drift over time in the relationship between CPUE and actual stock abundance.  This is a major shortcoming and definitely stacks the deck in favor of the simple model.  The often substantial divergence among CPUE trends from various fleets in ICCAT is a very graphic indication of the existence of substantial process error in the "q" for these fleets.
+  
+  \begin{itemize}
+    \item \red{While it is true that in the past there is a tendency to run ICCAT assessments with all available CPUE series, for example with Multifan-cl and SS which need time series of catch and effort by fishery. The procedure used when running other stock assessment models such as those based on biomass is the one that we were evaluating.}
+
+    \red{As the reviewer correctly notes often the CPUE indices used when fitting an assessment model are conflicting. Including all the conflicting signals in a single assessment will result in parameter estimates intermediate to what would be obtained from the data sets individually and \cite{schnute1993analysis} showed the most likely parameter values are not intermediary but occur at one of the apparent extremes. We therefore adopt the approach of the Commission for the Conservation of Southern Bluefin Tuna (CCSBT) by including robustness trials \citep[see][]{hillary2015scientific} by including 2 new factors i.e. i) positive bias in future longline CPUE due to a trend in catchability and a nonlinear relationship between longline CPUE and abundance so that proportional changes in actual abundance are greater than those observed in the CPUE. ii) \citep{harley2001cpue} showed that CPUE was likely to remain high while abundance declines (i.e., hyperstability, where b < 1), therefore as in the SBT case we assume hyperstable CPUE to biomass (CPUE proportional to 0.75  abundance).}
+    
+    \red{CPUE was sampled with a log normal error and a CV of 30\% based on the estimates for MultifanCL \citep{anon}.} 
+    
+    \red{Quota management for albacore has only been introduced recently and catches often are below the TAC landings are not thought subject to implementation error.}
+    
+  \end{itemize}
+
+\end{enumerate}
+
+
+
+\subsection*{Reviewer: 2}
+
+
+\begin{enumerate}
+ \item I think this/w is a worthy manuscript so it pains me to reject it in its present form but I have reached the end of my tether with manuscripts sent to me for review that have not gone through an adequate internal review process. There are a number of authors on this manuscript and so there are no excuses. I am happy to review this manuscript again as I believe it is an important piece of work that can add alot to the field. I am OK with a few typos but when it gets to the point that I am unable to work out what the authors are trying to say in key areas then I am going to draw the line. 
+ 
+ \item  Some examples include tables 1,2 and 3 being referenced incorrectly in the text, 
+  \begin{itemize}
+    \item  \red{References corrected}
+  \end{itemize}
+ \item acronyms that are not defined, 
+  \begin{itemize}
+    \item \red{acronyms are now all defined on first reference, table \ref{tab:} now provides a summary of these.}
+  \end{itemize}
+ \item equations that are incomplete, 
+  \begin{itemize}
+    \item \red{All equations checked for completeness} 
+  \end{itemize}
+ \item figures that do not have completed captions, 
+  \begin{itemize}
+    \item \red{All figure captions are now complete, i.e. self contained so that they are clear to the reader.}
+  \end{itemize}
+ \item references that are shown to be missing, 
+  \begin{itemize}
+    \item  \red{All citations in the reference list}
+  \end{itemize}
+ \item quite a few sentences that make no sense, and 
+  \begin{itemize}
+    \item \red{Paper fully revised and checked} 
+  \end{itemize}
+ \item the authors should also double check the information shown in Figure 1 - I believe it is incorrect. 
+  \begin{itemize}
+    \item  \red{Even Craig understood it.}
+  \end{itemize}
+  \end{enumerate}
+\newpage
+
+\bibliography{refs}
+\bibliographystyle{abbrvnat}
+%\bibliographystyle{cjfas}
+
+\end{document}

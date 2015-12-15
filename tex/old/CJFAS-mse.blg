@@ -1,0 +1,80 @@
+This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: CJFAS-mse.aux
+The style file: abbrvnat.bst
+Database file #1: refs.bib
+Repeated entry---line 2388 of file refs.bib
+ : @article{fromentin2013oceanographic
+ :                                    ,
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 5589 of file refs.bib
+ :   
+ :   journal={Fish. Res.}
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Warning--I'm ignoring kell2015kobe's extra "title" field
+--line 5800 of file refs.bib
+I was expecting a `,' or a `}'---line 5800 of file refs.bib
+ :    title={The quantification and presentation of risk. In: Fisheries Management Science: an introduction to simulation based methods}
+ :                                                                                                                                      .
+I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "kell2015srp"
+Warning--I didn't find a database entry for "hilborn_quantitative_1992"
+Warning--I didn't find a database entry for "beverton_dynamics_1993"
+Too many commas in name 2 of "Kell, L.T. and Levontin, P., Davies, C. and Harley, S. and Kolody D. and Maunder, M. and Mosqueira I. and Pilling G., and Sharma, R." for entry kell2015kobe
+while executing---line 1347 of file abbrvnat.bst
+Name 7 in "Kell, L.T. and Levontin, P., Davies, C. and Harley, S. and Kolody D. and Maunder, M. and Mosqueira I. and Pilling G., and Sharma, R." has a comma at the end for entry kell2015kobe
+while executing---line 1347 of file abbrvnat.bst
+Warning--there's a number but no series in hilborn2000documentation
+Too many commas in name 2 of "Kell, L.T. and Levontin, P., Davies, C. and Harley, S. and Kolody D. and Maunder, M. and Mosqueira I. and Pilling G., and Sharma, R." for entry kell2015kobe
+while executing---line 1429 of file abbrvnat.bst
+Name 7 in "Kell, L.T. and Levontin, P., Davies, C. and Harley, S. and Kolody D. and Maunder, M. and Mosqueira I. and Pilling G., and Sharma, R." has a comma at the end for entry kell2015kobe
+while executing---line 1429 of file abbrvnat.bst
+Too many commas in name 2 of "Kell, L.T. and Levontin, P., Davies, C. and Harley, S. and Kolody D. and Maunder, M. and Mosqueira I. and Pilling G., and Sharma, R." for entry kell2015kobe
+while executing---line 1429 of file abbrvnat.bst
+Name 7 in "Kell, L.T. and Levontin, P., Davies, C. and Harley, S. and Kolody D. and Maunder, M. and Mosqueira I. and Pilling G., and Sharma, R." has a comma at the end for entry kell2015kobe
+while executing---line 1429 of file abbrvnat.bst
+Warning--empty publisher in kell2015kobe
+Warning--there's a number but no volume in santiago2004dinamica
+You've used 40 entries,
+            2773 wiz_defined-function locations,
+            829 strings with 12487 characters,
+and the built_in function-call counts, 18839 in all, are:
+= -- 1624
+> -- 1188
+< -- 31
++ -- 402
+- -- 362
+* -- 1527
+:= -- 2943
+add.period$ -- 122
+call.type$ -- 40
+change.case$ -- 234
+chr.to.int$ -- 40
+cite$ -- 83
+duplicate$ -- 852
+empty$ -- 1483
+format.name$ -- 430
+if$ -- 3942
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 44
+newline$ -- 208
+num.names$ -- 162
+pop$ -- 455
+preamble$ -- 1
+purify$ -- 198
+quote$ -- 0
+skip$ -- 683
+stack$ -- 0
+substring$ -- 597
+swap$ -- 86
+text.length$ -- 8
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 415
+warning$ -- 3
+while$ -- 154
+width$ -- 0
+write$ -- 520
+(There were 9 error messages)

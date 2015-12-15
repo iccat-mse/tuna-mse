@@ -1,0 +1,273 @@
+\begin{thebibliography}{40}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Arrizabalaga(2014)]{arrizabalaga2014habitat}
+H.~Arrizabalaga.
+\newblock Global habitat preferences of principal market tunas.
+\newblock \emph{xxxxxx}, x\penalty0 (xx):\penalty0 xxx--xxx, 2014.
+
+\bibitem[Beverton(1992)]{beverton1992patterns}
+R.~Beverton.
+\newblock Patterns of reproductive strategy parameters in some marine teleost
+  fishes.
+\newblock \emph{Journal of Fish Biology}, 41:\penalty0 137--160, 1992.
+
+\bibitem[Beverton and Holt(1993)]{beverton1993dynamics}
+R.~Beverton and S.~Holt.
+\newblock \emph{On the dynamics of exploited fish populations}, volume~11.
+\newblock Springer, 1993.
+
+\bibitem[Butterworth and Punt(1999)]{butterworth1999experiences}
+D.~Butterworth and A.~Punt.
+\newblock Experiences in the evaluation and implementation of management
+  procedures.
+\newblock \emph{ICES Journal of Marine Science: Journal du Conseil},
+  56\penalty0 (6):\penalty0 985--998, 1999.
+
+\bibitem[Chen and Watanabe(1989)]{chen1989age}
+S.~Chen and S.~Watanabe.
+\newblock Age dependence of natural mortality coefficient in fish population
+  dynamics.
+\newblock \emph{Nippon Suisan Gakkaishi}, 55\penalty0 (2):\penalty0 205--208,
+  1989.
+
+\bibitem[Cushing(1973)]{cushing1973dependence}
+D.~Cushing.
+\newblock Dependence of recruitment on parent stock.
+\newblock \emph{Journal of the Fisheries Board of Canada}, 30\penalty0
+  (12):\penalty0 1965--1976, 1973.
+
+\bibitem[De~Bruyn et~al.(2012)De~Bruyn, Murua, and Aranda]{de2012precautionary}
+P.~De~Bruyn, H.~Murua, and M.~Aranda.
+\newblock The precautionary approach to fisheries management: How this is taken
+  into account by tuna regional fisheries management organisations ({RFMOs)}.
+\newblock \emph{Marine Policy}, 2012.
+
+\bibitem[Edwards and Dankel(2015)]{edwards2015book}
+C.~Edwards and D.~Dankel.
+\newblock \emph{Fisheries management science: an introduction to simulation
+  based methods}.
+\newblock Earthscan (Routledge), Oxford, UK, 2015.
+
+\bibitem[Fromentin et~al.(2013)Fromentin, Reygondeau, Bonhommeau, and
+  Beaugrand]{fromentin2013oceanographic}
+J.-M. Fromentin, G.~Reygondeau, S.~Bonhommeau, and G.~Beaugrand.
+\newblock Oceanographic changes and exploitation drive the spatio-temporal
+  dynamics of atlantic bluefin tuna (thunnus thynnus).
+\newblock \emph{Fisheries Oceanography}, 2013.
+
+\bibitem[Fromentin et~al.(2014)Fromentin, Bonhommeau, Arrizabalaga, and
+  L.~Kell]{fromentin2014spectre}
+J.-M. Fromentin, S.~Bonhommeau, H.~Arrizabalaga, and L.~L.~Kell.
+\newblock The spectre of uncertainty in management of exploited fish stocks:
+  the illustrative case of atlantic bluefin tuna.
+\newblock \emph{Marine Policy}, 47:\penalty0 8--14, 2014.
+
+\bibitem[Gabriel and Mace(1999)]{gabriel1999review}
+W.~Gabriel and P.~Mace.
+\newblock A review of biological reference points in the context of the
+  precautionary approach.
+\newblock In \emph{Proceedings of the fifth national {NMFS} stock assessment
+  workshop: providing scientific advice to implement the precautionary approach
+  under the Magnuson-Stevens fishery conservation and management act. {NOAA}
+  Tech Memo {NMFS-F/SPO-40}}, pages 34--45, 1999.
+
+\bibitem[Garcia(1996)]{garcia1996precautionary}
+S.~Garcia.
+\newblock The precautionary approach to fisheries and its implications for
+  fishery research, technology and management: an updated review.
+\newblock \emph{{FAO} Fisheries Technical Paper}, pages 1--76, 1996.
+
+\bibitem[Geromont and Butterworth(2014)]{geromont2014generic}
+H.~Geromont and D.~Butterworth.
+\newblock Generic management procedures for data-poor fisheries: forecasting
+  with few data.
+\newblock \emph{ICES Journal of Marine Science: Journal du Conseil}, page
+  fst232, 2014.
+
+\bibitem[Harley et~al.(2001)Harley, Myers, and Dunn]{harley2001cpue}
+S.~J. Harley, R.~A. Myers, and A.~Dunn.
+\newblock Is catch-per-unit-effort proportional to abundance?
+\newblock \emph{Canadian Journal of Fisheries and Aquatic Sciences},
+  58\penalty0 (9):\penalty0 1760--1772, 2001.
+
+\bibitem[Hilborn et~al.(2000)Hilborn, Maunder, Parma, Ernst, Paynes, and
+  Starr]{hilborn2000documentation}
+R.~Hilborn, M.~Maunder, A.~Parma, B.~Ernst, J.~Paynes, and P.~Starr.
+\newblock \emph{Documentation for a general age-structured Bayesian stock
+  assessment model: code named Coleraine}.
+\newblock Number {FRI/UW} 00/01. Fisheries Research Institute, University of
+  Washington, 2000.
+
+\bibitem[Hillary et~al.(2013)Hillary, Ann~Preece, and
+  Davies]{hillary2013sbthcr}
+R.~Hillary, A.~Ann~Preece, and C.~Davies.
+\newblock M{P} estimation performance relative to current input cpue and aerial
+  survey data.
+\newblock \emph{CCSBT Extended Scientific Committee held in Canberra},
+  1309\penalty0 (19), 2013.
+
+\bibitem[Hillary et~al.(2015)Hillary, Preece, Davies, Kurota, Sakai, Itoh,
+  Parma, Butterworth, Ianelli, and Branch]{hillary2015scientific}
+R.~M. Hillary, A.~L. Preece, C.~R. Davies, H.~Kurota, O.~Sakai, T.~Itoh, A.~M.
+  Parma, D.~S. Butterworth, J.~Ianelli, and T.~A. Branch.
+\newblock A scientific alternative to moratoria for rebuilding depleted
+  international tuna stocks.
+\newblock \emph{Fish and Fisheries}, 2015.
+
+\bibitem[Hillson(2011)]{hillson2011risk}
+D.~Hillson.
+\newblock Risk doctor briefing-the definition debate continued.
+\newblock \emph{Journal of Project, Program \& Portfolio Management},
+  2\penalty0 (1), 2011.
+
+\bibitem[Kell et~al.(2003)Kell, Die, Restrepo, Fromentin, Ortiz~de Zarate,
+  Pallares, et~al.]{kell2003tuna}
+L.~Kell, D.~Die, V.~Restrepo, J.~Fromentin, V.~Ortiz~de Zarate, P.~Pallares,
+  et~al.
+\newblock An evaluation of management strategies for atlantic tuna stocks.
+\newblock \emph{Scientia Marina (Barcelona)}, 2003, 2003.
+
+\bibitem[Kell et~al.(2006)Kell, De~Oliveira, Punt, {McAllister}, and
+  Kuikka]{kell2006operational}
+L.~Kell, J.~A. De~Oliveira, A.~E. Punt, M.~K. {McAllister}, and S.~Kuikka.
+\newblock Operational management procedures: an introduction to the use of
+  evaluation frameworks.
+\newblock \emph{Developments in Aquaculture and Fisheries Science},
+  36:\penalty0 379--407, 2006.
+
+\bibitem[Kell et~al.(2015)Kell, Levontin, Harley, D., Maunder, I., G., and
+  Sharma]{kell2015kobe}
+L.~Kell, D.~C. Levontin, P., S.~Harley, K.~D., M.~Maunder, M.~I., P.~G., and
+  R.~Sharma.
+\newblock Fisheries management science: an introduction to simulation based
+  methods.
+\newblock In C.~Edwards and D.~Dankel, editors, \emph{Fisheries management
+  science: an introduction to simulation based methods}. 2015.
+
+\bibitem[Kirkwood and Smith(1995)]{kirkwood1995assessing}
+G.~Kirkwood and A.~Smith.
+\newblock Assessing the precautionary nature of fishery management strategies.
+\newblock \emph{Fisheries and Agriculture Organization. Precautionary approach
+  to fisheries. Part}, 2, 1995.
+
+\bibitem[Leach et~al.(2014)Leach, Levontin, Holt, Kell, and
+  Mumford]{leach2014elicit}
+A.~Leach, P.~Levontin, J.~Holt, L.~Kell, and J.~Mumford.
+\newblock Identification and prioritization of uncertainties for management of
+  eastern atlantic bluefin tuna (\textit{Thunnus thynnus}).
+\newblock \emph{Marine Policy}, 48:\penalty0 84–92, 2014.
+
+\bibitem[Lorenzen and Enberg(2002)]{lorenzen2002density}
+K.~Lorenzen and K.~Enberg.
+\newblock Density-dependent growth as a key mechanism in the regulation of fish
+  populations: evidence from among-population comparisons.
+\newblock \emph{Proceedings of the Royal Society of London. Series B:
+  Biological Sciences}, 269\penalty0 (1486):\penalty0 49--54, 2002.
+
+\bibitem[Maunder et~al.(2006)Maunder, Sibert, Fonteneau, Hampton, Kleiber, and
+  Harley]{maunder_interpreting_2006}
+M.~N. Maunder, J.~R. Sibert, A.~Fonteneau, J.~Hampton, P.~Kleiber, and S.~J.
+  Harley.
+\newblock Interpreting catch per unit effort data to assess the status of
+  individual stocks and communities.
+\newblock \emph{{ICES} Journal of Marine Science: Journal du Conseil},
+  63\penalty0 (8):\penalty0 1373--1385, 2006.
+
+\bibitem[{McKechnie} et~al.(2013){McKechnie}, Hoyle, and
+  Harley]{mckechnie_longline_2013}
+S.~{McKechnie}, S.~Hoyle, and S.~Harley.
+\newblock Longline {CPUE} series that account for changes in the spatial extent
+  of fisheries.
+\newblock Technical report, {WCPFC-SC9-2013/SA-IP-05}, 2013.
+
+\bibitem[Paloheimo and Dickie(1964)]{paloheimo_abundance_1964}
+J.~Paloheimo and L.~Dickie.
+\newblock Abundance and fishing success.
+\newblock \emph{Rapports et Proces-Verbaux des Réunions du Conseil
+  International pour {l’Exploration} de la Mer}, 155, 1964.
+
+\bibitem[Pella and Tomlinson(1969)]{pella1969generalized}
+J.~Pella and P.~Tomlinson.
+\newblock \emph{A generalized stock production model}.
+\newblock Inter-American Tropical Tuna Commission, 1969.
+
+\bibitem[Polacheck(2006)]{polacheck2006tuna}
+T.~Polacheck.
+\newblock Tuna longline catch rates in the indian ocean: Did industrial fishing
+  result in a 90\% rapid decline in the abundance of large predatory species?
+\newblock \emph{Marine Policy}, 30\penalty0 (5):\penalty0 470--482, 2006.
+
+\bibitem[Punt(2008)]{punt2008refocusing}
+A.~Punt.
+\newblock Refocusing stock assessment in support of policy evaluation.
+\newblock \emph{Fisheries for Global Welfare and Environment}, pages 139--152,
+  2008.
+
+\bibitem[Punt and Donovan(2007)]{punt2007developing}
+A.~Punt and G.~Donovan.
+\newblock Developing management procedures that are robust to uncertainty:
+  lessons from the {International} {Whaling} {Commission}.
+\newblock \emph{{ICES} Journal of Marine Science: Journal du Conseil},
+  64\penalty0 (4):\penalty0 603--612, 2007.
+
+\bibitem[Punt et~al.(2014)Punt, Butterworth, L, De~Oliveira, and
+  Haddon]{punt2014management}
+A.~E. Punt, D.~S. Butterworth, M.~L, J.~A. De~Oliveira, and M.~Haddon.
+\newblock Management strategy evaluation: best practices.
+\newblock \emph{Fish and Fisheries}, 2014.
+
+\bibitem[Radatz et~al.(1990)Radatz, Geraci, and Katki]{radatz1990ieee}
+J.~Radatz, A.~Geraci, and F.~Katki.
+\newblock Ieee standard glossary of software engineering terminology.
+\newblock \emph{IEEE Std}, 610121990:\penalty0 121990, 1990.
+
+\bibitem[Rosenberg and Restrepo(1994)]{rosenberg1994uncertainty}
+A.~A. Rosenberg and V.~R. Restrepo.
+\newblock Uncertainty and risk evaluation in stock assessment advice for us
+  marine fisheries.
+\newblock \emph{Canadian Journal of Fisheries and Aquatic Sciences},
+  51\penalty0 (12):\penalty0 2715--2720, 1994.
+
+\bibitem[Santiago(2004)]{santiago2004dinamica}
+J.~Santiago.
+\newblock Din{\'a}mica de la poblaci{\'o}n de at{\'u}n blanco (thunnus
+  alalunga, bonaterre 1788) del atl{\'a}ntico norte.
+\newblock \emph{Departamento de Agricultura y Pesca del Gobierno Vasco.
+  Colecci{\'o}n Tesis Doctorales}, \penalty0 (52), 2004.
+
+\bibitem[Schnute and Hilborn(1993)]{schnute1993analysis}
+J.~T. Schnute and R.~Hilborn.
+\newblock Analysis of contradictory data sources in fish stock assessment.
+\newblock \emph{Canadian Journal of Fisheries and Aquatic Sciences},
+  50\penalty0 (9):\penalty0 1916--1923, 1993.
+
+\bibitem[Tidd et~al.(2011)Tidd, Hutton, Kell, and Padda]{tidd2011exit}
+A.~N. Tidd, T.~Hutton, L.~Kell, and G.~Padda.
+\newblock Exit and entry of fishing vessels: an evaluation of factors affecting
+  investment decisions in the north sea english beam trawl fleet.
+\newblock \emph{{ICES} Journal of Marine Science: Journal du Conseil},
+  68\penalty0 (5):\penalty0 961--971, 2011.
+
+\bibitem[Von~Bertalanffy(1957)]{vonbert1957quantitative}
+L.~Von~Bertalanffy.
+\newblock Quantitative laws in metabolism and growth.
+\newblock \emph{Quarterly Review of Biology}, pages 217--231, 1957.
+
+\bibitem[Williams and Shertzer(2003)]{williams2003implications}
+E.~Williams and K.~Shertzer.
+\newblock Implications of life-history invariants for biological reference
+  points used in fishery management.
+\newblock \emph{Canadian Journal of Fisheries and Aquatic Sciences},
+  60\penalty0 (6):\penalty0 710--720, 2003.
+
+\bibitem[Zhou et~al.(1996)Zhou, Doyle, Glover, et~al.]{zhou1996robust}
+K.~Zhou, J.~C. Doyle, K.~Glover, et~al.
+\newblock \emph{Robust and optimal control}, volume~40.
+\newblock Prentice Hall New Jersey, 1996.
+
+\end{thebibliography}

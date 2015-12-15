@@ -1,0 +1,35 @@
+\begin{thebibliography}{4}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Harley et~al.(2001)Harley, Myers, and Dunn]{harley2001cpue}
+S.~J. Harley, R.~A. Myers, and A.~Dunn.
+\newblock Is catch-per-unit-effort proportional to abundance?
+\newblock \emph{Canadian Journal of Fisheries and Aquatic Sciences},
+  58\penalty0 (9):\penalty0 1760--1772, 2001.
+
+\bibitem[Hillary et~al.(2015)Hillary, Preece, Davies, Kurota, Sakai, Itoh,
+  Parma, Butterworth, Ianelli, and Branch]{hillary2015scientific}
+R.~M. Hillary, A.~L. Preece, C.~R. Davies, H.~Kurota, O.~Sakai, T.~Itoh, A.~M.
+  Parma, D.~S. Butterworth, J.~Ianelli, and T.~A. Branch.
+\newblock A scientific alternative to moratoria for rebuilding depleted
+  international tuna stocks.
+\newblock \emph{Fish and Fisheries}, 2015.
+
+\bibitem[Rademeyer et~al.(2007)Rademeyer, Plag{\'a}nyi, and
+  Butterworth]{rademeyer2007tips}
+R.~A. Rademeyer, {\'E}.~E. Plag{\'a}nyi, and D.~S. Butterworth.
+\newblock Tips and tricks in designing management procedures.
+\newblock \emph{ICES Journal of Marine Science: Journal du Conseil},
+  64\penalty0 (4):\penalty0 618--625, 2007.
+
+\bibitem[Schnute and Hilborn(1993)]{schnute1993analysis}
+J.~T. Schnute and R.~Hilborn.
+\newblock Analysis of contradictory data sources in fish stock assessment.
+\newblock \emph{Canadian Journal of Fisheries and Aquatic Sciences},
+  50\penalty0 (9):\penalty0 1916--1923, 1993.
+
+\end{thebibliography}
