@@ -1,0 +1,588 @@
+Figures
+========================================================
+
+```{r , echo=FALSE}
+library(knitr)
+
+opts_chunk$set(comment=NA, fig.width =8, 
+                           fig.height=6,
+                           fig.path  ="../tex/",
+                           warning=FALSE, 
+                           message=FALSE, 
+                           error  =FALSE, 
+                           echo   =FALSE,
+                           cache  =TRUE)
+```
+
+
+```{r -init}
+library(ggplot2)
+library(FLBRP)
+library(FLife)
+library(ggplotFL)
+library(plyr)
+library(reshape)
+library(scales)
+library(kobe)
+library(biodyn)
+
+dirOld='/home/laurie/Desktop/MEGA/papers/submitted/tuna-mse/data'
+dirNew='/home/laurie/MEGAsync/papers/tuna-mse/data'
+```
+
+
+```{r}
+load(file.path(dirOld,"OMs.RData"))
+load(file.path(dirOld,"BRPs.RData"))
+```
+
+
+Phase Plot with simulated stock and HCR
+---------------------------------------
+```{r kobeHcr,fig.width=5,fig.height=5}
+om=OMs[[ 21]]
+br=BRPs[[21]]
+
+rln=model.frame(FLQuants(br,
+                "stock"  =function(x) ssb( x)%/%FLBRP:::refpts(x)["msy","ssb"],
+                "harvest"=function(x) fbar(x)%/%FLBRP:::refpts(x)["msy","harvest"]),
+                drop=T)
+
+## F in recovery period
+rcv.=seq(c(fbar(om)[,ac(50)]),c(FLBRP:::refpts(br)["msy","harvest"])*0.7,length.out=6)
+rcv =FLQuant(rcv.,dimnames=dimnames(fbar(om)[,ac(50:55)]))
+om  =FLash:::fwd(om,f=rcv, sr=br)  
+dat=subset(model.frame(FLQuants("stock"  =ssb( om)/FLBRP:::refpts(br)["msy","ssb"],
+                                "harvest"=fbar(om)/FLBRP:::refpts(br)["msy","harvest"]),drop=T),year<=55)
+hcr=as.data.frame(
+      rbind(cbind(stock=0.0, harvest=.01),
+            cbind(stock=0.4, harvest=.01),
+            cbind(stock=0.8, harvest=.70),
+            cbind(stock=2.0, harvest=.70)))
+
+kobePhase(xlim=c(0,2))+
+  geom_line(aes(stock,harvest),col="black",size=1,  data=rln)+
+  geom_line(aes(stock,harvest),col="brown",size=2,  data=hcr)
+  #geom_path(aes(stock,harvest),col="cyan", size=1.5,data=dat)
+```
+
+Priors for biodyn
+---------------------------------------
+```{r ,eval=FALSE}
+refpts=FLBRP:::refpts
+
+globalMsyFn=function(brp){
+  
+  x=brp
+  
+  ages=dimnames(landings.sel(x))$age
+  
+  mat=matrix(1,length(ages),length(ages))
+  mat[upper.tri(mat)][]=0
+  
+  landings.sel(x)=propagate(landings.sel(x),length(ages))
+  landings.sel(x)[]=mat
+  discards.sel(x)[]=0
+  
+  refpts(x)=refpts(x)["msy"]
+  refpts(x)=computeRefpts(x)
+  refpts(x)["msy","yield"]
+  age=ages[refpts(x)["msy","yield"]==max(refpts(x)["msy","yield"])]
+  
+  iter=dimnames(landings.sel(x))$iter[refpts(x)["msy","yield"]==max(refpts(x)["msy","yield"])]
+  
+  rtn=c(as.numeric(age),refpts(x)["msy",2:5,iter])
+  
+  names(rtn)=c("age","yield","rec","ssb","biomass")
+  
+  rtn}
+
+
+priorFn=function(om,br){
+  refpts=FLBRP:::refpts
+  msy =c(refpts(br)["msy","yield"])
+  bmsy=c(refpts(br)["msy","biomass"])
+  r_  =try(calcR(br))
+  if ("try-error"%in% is(r_)) r_=NA
+  
+  k   =refpts(br)["virgin","biomass"]
+  b0  =c(stock(om)[,1]/k)
+  
+  f=c(refpts(br)["crash","harvest"])
+  if (is.na(f)) f=c(refpts(br)["msy","harvest"])*3
+  r=try(log(lambda(leslie(br,f))))
+  if ("try-error"%in% is(r)) r=NA
+  
+  p=optimise(function(p,bmsy,k) 
+                (bmsy-k*(1/(1+p))^(1/p))^2, c(0.001,5), bmsy=bmsy,k=k)$minimum
+  
+  c(msy=msy,bmsy=bmsy,fmsy=msy/bmsy,r=r,r_=r_,k=k,shape=bmsy/k,p=p,b0=b0)}
+
+priors=mdply(data.frame(OM=1:128),function(OM) 
+                  {print(OM); priorFn(OMs[[OM]],BRPs[[OM]])})
+global=mdply(data.frame(OM=1:128),function(OM) 
+                  {print(OM); globalMsyFn(BRPs[[OM]])})
+
+save(priors,file=file.path(dirNew,"priors.RData"))
+save(global,file=file.path(dirNew,"global.RData"))
+```
+
+
+Production Functions
+---------------------------------------
+```{r pFn, eval=FALSE}
+source('~/Desktop/flr/backUp/git/biodyn/R/biodyn-plots.R')
+source('~/Desktop/flr/backUp/git/biodyn/R/biodyn-constructors.R')
+source('~/Desktop/flr/git/biodyn/R/biodyn-methods.R')
+source('~/Desktop/flr/git/biodyn/R/biodyn-fwd.R')
+
+computeSP=computePrd
+
+i=21
+
+calcPar=function(msy,bmsy,p){
+  k=bmsy/((1/(1+p))^(1/p))
+  r=msy/(k*(1/(1+p))^(1/p+1))
+
+  FLPar(c(r=r,k=k,p=p))}
+
+dat=rbind(cbind("Shape"="Known",Parametrisation="MSY",
+                plotSP(biodyn("pellat",params=with(priors[i,],calcPar(msy,bmsy,p))),        
+                       BRPs[[i]])$data),
+          cbind("Shape"="p=1",     Parametrisation="MSY", 
+                plotSP(biodyn("pellat",params=with(priors[i,],calcPar(msy,bmsy,p=1))),      
+                       BRPs[[i]])$data),
+          cbind("Shape"="Known",Parametrisation="r & K",
+                plotSP(biodyn("pellat",params=FLPar(unlist(priors[i,c("r","k","p")]))),     
+                       BRPs[[i]])$data),
+          cbind("Shape"="p=1",     Parametrisation="r & K",
+                plotSP(biodyn("pellat", params=FLPar(c(unlist(priors[i,c("r","k")]),p=1))), 
+                       BRPs[[i]])$data))
+
+dat=transform(dat,Parametrisation=factor(Parametrisation,levels=c("r & K","MSY")))
+
+ggplot(dat)+
+  geom_path(aes(stock,catch,col=What,group=What))+
+  facet_grid(Shape~Parametrisation)+
+  kobe:::theme_ms()+xlab("Biomass")+ylab("Production")
+```
+
+
+```{r runop, eval=FALSE}
+load(file.path(dirNew,"priors.RData"))
+om=OMs[["21"]]
+br=BRPs[["21"]]
+
+#rm(biodyn)
+
+priors=transform(priors,fmsy=msy/bmsy)
+om    =window(om,end=55)
+
+srDev=exp(FLife:::noise(1000,FLQuant(0,dimnames=list(age=1,year=1:75)), b=0,sd=0.3))
+om   =FLash:::fwd(om,f=fbar(om)[,ac(2:55)],sr=br,sr.residuals=srDev)
+om   =FLBRP:::fwdWindow(om,br,end=75)
+f    =FLQuant(c(FLBRP:::refpts(br)["msy","harvest"])*.7,
+              dimnames=dimnames(fbar(om)[,ac(56:75)]))
+om   =FLash:::fwd(om,f=f,sr=br,sr.residuals=srDev)
+cpue =biodyn:::oem(window(om,start=26,end=75),0.3)
+bd   =as(om,"biodyn")
+
+ctrl                            =with(priors[21,],biodyn:::controlFn(r,k,p,b0))
+params(bd)[dimnames(ctrl)$param]=ctrl[dimnames(ctrl)$param,"val"]
+    
+setParams( bd)=cpue
+setControl(bd)=params(bd)
+bd@control[dimnames(ctrl)$params,"phase"][]=ctrl[dimnames(ctrl)$params,"phase"]
+
+#bd@priors
+#bd =fit(bd,cpue,cmdOps=paste("-maxfn 500 -iprint 0 -est"))
+
+runFit=function(prr,p,prior,bd,cpue,cv=0.3){
+
+  if (p==1) bd@control["p",c("phase","val")]=c(-1,1) else 
+            bd@control["p",c("phase","val")]=unlist(c(-1,prior["p"]))
+  
+  if (prr!="None")
+   bd@priors[prr,c("weight","a","b")]=unlist(c(1,prior[prr],cv*prior[prr]))
+ 
+  print(paste(prr,c("p=1","P known")[p]))
+  print(bd@priors)
+
+  bd =fit(bd,cpue,cmdOps=paste("-maxfn 500 -iprint 0 -est"))
+  
+  mp=cbind(model.frame(biodyn:::refpts(bd))[,-4],model.frame(params(bd)[c("r","k")]))
+  om=melt(prior[dimnames(mp)[[2]][-6]])
+  mp=melt(mp,id="iter")
+  
+  names(om)[2]="om"
+  names(mp)[3]="mp"
+  merge(mp,om)}
+
+op=mdply(expand.grid(prr=c("None","r","k","msy","bmsy","fmsy"),p=c(1,2),
+                     stringsAsFactors=FALSE), runFit, prior=priors[21,],bd=bd,cpue=cpue)
+
+save(op,file=file.path(dirDat,"op.RData"))
+```
+
+
+```{r SA1}
+load(file.path(dirNew,"op.RData"))
+
+op=transform(op,val=(mp-om)/om,
+                variable=factor(variable,levels=c("r","k","bmsy","fmsy","msy")),
+                prr     =factor(prr,     levels=c("None","r","k","bmsy","fmsy","msy")),
+                col     =variable==prr,
+                p       =factor(p, labels=c("p=1","Skewed"), levels=c(1,2)))
+
+ggplot(subset(op,p=="p=1"))+
+  geom_density(aes(val,fill=col))+
+  geom_vline(aes(xintercept=0),col="red")+
+  facet_grid(prr~variable,scale="free")+
+  scale_x_continuous(limits=c(-1.5,1.5),breaks=c(-1.0,0,1.0))+
+  scale_fill_manual(values=c("blue","red"),guide="none")+
+  kobe:::theme_ms(12)
+```
+
+```{r SA2}
+ggplot(subset(op,p!="p=1"))+
+  geom_density(aes(val,fill=col))+
+  geom_vline(aes(xintercept=0),col="red")+
+  facet_grid(prr~variable,scale="free")+
+  scale_x_continuous(limits=c(-1.5,1.5),breaks=c(-1.0,0,1.0))+
+  scale_fill_manual(values=c("blue","red"),guide="none")+
+  kobe:::theme_ms(12)
+```
+
+```{r SA3}
+ggplot(op)+
+  geom_density(aes(val,fill=p),alpha=.5)+
+  geom_vline(aes(xintercept=0),col="red")+
+  facet_grid(prr~variable,scale="free")+
+  scale_x_continuous(limits=c(-1.5,1.5),breaks=c(-1.0,0,1.0))+
+  scale_fill_manual(values=c("blue","red"),guide="none")+
+  kobe:::theme_ms(12)
+```
+
+Design
+---------------------------------------
+```{r popPar}
+load(file.path(dirNew,"design.RData"))
+load(file.path(dirNew,"priors.RData"))
+
+design.=transform(design, k        =as.integer(as.factor(k)),
+                          a50      =as.integer(as.factor(a50)),
+                          m        =as.integer(as.factor(m)),
+                          srr      =as.integer(as.factor(srr)),
+                          steepness=as.integer(as.factor(steepness)),
+                          sr       =as.integer(as.factor(sr)),
+                          a1       =as.integer(as.factor(a1)))
+
+baseCase=priors[apply(design.,1,function(x) sum(x))== 7,]
+level2  =priors[apply(design.,1,function(x) sum(x))== 8,]
+sims    =as.integer(c(dimnames(baseCase)[[1]],
+                         dimnames(level2)[[1]]))
+
+omKey=c("Base Case","Steepness","Chen-W","Fast Growth",
+        "Maturity","Cushing","Domed Sel","Juvenile Sel","Red Noise")[-9]
+names(omKey)=sims
+
+save(omKey,file=file.path(dirDat,"omKey.RData"))
+```
+
+MOU, counterfactual
+---------------------------------------
+
+```{r, eval=FALSE}
+library(RSQLite)
+library(DBI)
+
+#source('/home/laurie/Desktop/flr/git/biodyn/R/biodyn-proj.R')
+#source('/home/laurie/Desktop/flr/git/biodyn/R/biodyn-control.R')
+#source('/home/laurie/Desktop/flr/git/biodyn/R/biodyn-coerce.R')
+source("/home/laurie/Desktop/flr/git/biodyn/R/biodyn-tseries.R")
+
+##Data sets
+db    =file.path(dirNew,"mou.db")
+
+# FLBRPs and FLStocks based on design
+load(file.path(dirNew,"/OMs.RData"))
+load(file.path(dirNew,"/BRPs.RData"))
+load(file.path(dirNew,"/omKey.RData"))
+
+## OM
+options=list(OM =rbind(data.frame(iOM=as.numeric(names(omKey)),ar=0.0),
+                       data.frame(iOM=21,                      ar=0.5)))
+
+## HCRs
+options$HCR =expand.grid(ftar=seq(0,2.5,0.1),blim=c(0),btrig=c(0))
+scen=expand.grid(iOM=seq(dim(options$OM)[1]),iF=seq(dim(options$HCR)[1]))
+scen=with(scen,cbind(options$OM[iOM,],options$HCR[iF,]))
+
+start=50; end=150; interval=3; rcvPeriod=3
+nits =1000; seed=7890 
+
+set.seed(seed)
+flq=FLQuant(0,dimnames=list(year=1:(end+interval)))
+srDev=FLQuants("0"=exp(lh:::noise(nits,flq,b=0,sd=.3)))
+
+set.seed(seed)
+srDev[["0.5"]]   =exp(lh:::noise(nits,flq,b=0.3,sd=0.5))
+
+# ran=mou[!duplicated(mou[,c("OM","ar","ftar")]),c("OM","ar","ftar")]
+# names(ran)[1]="iOM"
+# missings=merge(scen,cbind(ran,flag=TRUE),by=c("iOM","ar","ftar"),all=TRUE)
+# missings=subset(missings,is.na(flag))
+
+m_ply(scen[,1:3],function(iOM,ar,ftar){
+  
+  eql=BRPs[[iOM]]
+  srD=srDev[[ac(ar)]]
+
+  #### OM
+  om =OMs[[iOM]]
+  if (dims(om)$maxyear < end+interval)
+      om =fwdWindow(om,end=end+interval,eql)
+    
+  ## F in recovery period
+  rcv.=seq(c(fbar(om)[,ac(start)]),c(FLBRP:::refpts(eql)["msy","harvest"])*ftar,
+           length.out=rcvPeriod+1)
+  rcv =FLQuant(rcv.,dimnames=dimnames(fbar(om)[,ac(start+0:rcvPeriod)]))
+  om  =FLash:::fwd(om,f=rcv, sr=eql)
+    
+  ## F in longterm
+  lgt =FLQuant(rcv.[rcvPeriod+1],
+                      dimnames=list(year=(start+rcvPeriod+1):(end+interval)))
+  om  =FLash:::fwd(om,f=lgt,sr=eql)
+    
+  ## Add stochastcity
+  om  =propagate(om,nits)
+  om =FLash:::fwd(om,f =rlnorm(nits,log(fbar(FLCore:::iter(om,1))[,
+                                      ac(2:(end+interval))]),0.1),
+                     sr=eql,
+                     sr.residuals=srD)
+  
+  #### Save results
+  drv=dbDriver("SQLite")
+  con=dbConnect(drv, dbname=db)
+    
+  mou=cbind(OM=iOM,ar=ar,ftar=ftar,tseries(om,eql))
+
+  dbWriteTable(con, "mou", mou,append=TRUE)
+  
+  dbDisconnect(con)})
+
+drv=dbDriver("SQLite")
+con=dbConnect(drv, dbname=db)
+mou=dbReadTable(con, "mou")
+    
+save(mou,file=file.path(dirNew,"mou.RData"),compress="xz")
+```
+
+Transfer functions
+---------------------------------------
+
+```{r, eval=FALSE}
+load(file.path(dirNew,"mou.RData"))
+
+trans=ddply(subset(mou,year>=100),.(OM,ar,ftar,iter), with, 
+           data.frame(Green   =median(as.integer(ssb>=1)),
+                      Yield   =median(catch),
+                      F       =median(fbar),
+                      H       =median(harvest),
+                      aaY     =c(aav(FLQuant(catch))),
+                      aaF     =c(aav(FLQuant(fbar))),
+                      aaH     =c(aav(FLQuant(harvest))),
+                      Recruits=median(rec),
+                      RecruitV=median(recV),
+                      Stock   =median(stock),
+                      SSB     =median(ssb),
+                      StockV  =median(stockV),
+                      SSBV    =median(ssbV),
+                      ageC    =median(ageC),
+                      ageB    =median(ageB),
+                      ageS    =median(ageS)))
+
+save(trans,file=file.path(dirNew,"trans.RData"))
+
+trans=ddply(trans,.(OM,ar,ftar), with, 
+           data.frame(Green   =median(Green),
+                      Yield   =median(Yield),
+                      F       =median(F),
+                      H       =median(H),
+                      aaY     =median(aaY),
+                      aaF     =median(aaF),
+                      aaH     =median(aaH),
+                      Recruits=median(Recruits),
+                      RecruitV=median(RecruitV),
+                      Stock   =median(Stock),
+                      SSB     =median(SSB),
+                      StockV  =median(StockV),
+                      SSBV    =median(SSBV),
+                      ageC    =median(ageC),
+                      ageB    =median(ageB),
+                      ageS    =median(ageS)))
+```
+
+```{r transfer}
+load(file.path(dirNew,"trans.RData"))
+load(file.path(dirNew,"omKey.RData"))
+
+ggplot(trans)+
+  geom_path(aes(ftar,ageC))+
+  facet_wrap(ar~OM,scale="free")+
+  xlab("")+ylab("")+theme_bw()
+```
+
+```{r,eval=FALSE}
+load(file.path(dirNew,"mou.RData"))
+
+spc =ddply(subset(mou,year>55),.(OM,ar,ftar,iter), with, 
+                      as.data.frame(spectrum(ssb,plot=FALSE)[c("freq","spec")]))
+
+save(spc,file=file.path(dirNew,"spc.RData"))
+```
+
+```{r transfer2}
+load(file.path(dirNew,"spc.RData"))
+load(file.path(dirNew,"omKey.RData"))
+
+spc2=ddply(spc, .(OM,ar,ftar,freq), with, mean(spec))
+spc2=ddply(subset(spc2,freq>0),.(OM,ar,ftar),  transform, V2=V1/max(V1))
+
+ggplot(subset(spc2,freq>0.05&freq<.3&ftar%in%unique(spc2$ftar)[seq(1,51,3)]))+
+  geom_path(aes(freq,V1,col=paste(omKey[ac(OM)],ar)))+
+  facet_wrap(~ftar,scale="free_y")+
+  xlab("")+ylab("")+theme_bw()+
+  theme(legend.position="bottom")+
+  guides(col=guide_legend(nrow=2,title=""))
+```
+
+Decision Plot
+-------------------------
+  
+```{r}
+source('~/Desktop/flr/git/diags/R/diags-aav.R')
+
+load(file.path(dirNew,"om.RData"))
+
+om =cbind(om,kobe:::kobeP(transform(om,stock=stock,harvest=harvest)))
+om =subset(om,year>=57&year<=101)
+
+ssRed     =ddply(om,.(OM,omega,qTrend,HCR,SA,boundTac,boundF), 
+                 with, data.frame("Probability"=mean(red)))
+ssGreen   =ddply(om,.(OM,omega,qTrend,HCR,SA,boundTac,boundF), 
+                 with, data.frame("Probability"=mean(green)))
+ssOfishing=ddply(om,.(OM,omega,qTrend,HCR,SA,boundTac,boundF), 
+                 with, data.frame("Probability"=mean(overFishing)))
+ssOfished =ddply(om,.(OM,omega,qTrend,HCR,SA,boundTac,boundF), 
+                 with, data.frame("Probability"=mean(overFished)))
+ssE       =ddply(om,.(OM,omega,qTrend,HCR,SA,boundTac,boundF), 
+                 with, quantile(fbar,prob=c(0.25,.5,.75)))
+ssY       =ddply(om,.(OM,omega,qTrend,HCR,SA,boundTac,boundF), 
+                 with, quantile(catch, prob=c(0.25,.5,.75)))
+
+aaE=ddply(om,  .(OM,omega,qTrend,HCR,SA,boundTac,boundF,iter), with, av(fbar))
+aaE=ddply(aaE, .(OM,omega,qTrend,HCR,SA,boundTac,boundF),      with, mean(V1))
+
+aaY=ddply(transform(om,yr=year%/%3),  
+          .(OM,omega,qTrend,HCR,SA,boundTac,boundF,yr,iter), with,
+                mean(catch,na.rm=TRUE))                   
+aaY=ddply(aaY,  .(OM,omega,qTrend,HCR,SA,boundTac,boundF,iter), with, av(V1))
+aaY=ddply(aaY, .(OM,omega,qTrend,HCR,SA,boundTac,boundF),      with, mean(V1))
+
+nms=c("OM","omega","qTrend","HCR","SA","boundTac","boundF")
+res=merge(ssGreen[,c(nms,"Probability")],
+          ssE[    ,c(nms,"50%")])
+names(res)[8:9]=c("Green","Effort")
+res=merge(res,ssY[,c(nms,"50%")])
+names(res)[10]="Yield"
+res=merge(res,aaY[,c(nms,"V1")])
+names(res)[11]="aaY"
+res=merge(res,aaE[,c(nms,"V1")])
+names(res)[12]="aaE"
+
+save(res,file=file.path(dirNew,"res.RData"))
+```
+  
+```{r Smry,echo=FALSE}
+load(file.path(dirNew,"res.RData"))
+
+res=melt(res,id=nms)
+res=transform(res,
+              variable=factor(variable,
+                              levels=c("Green","Yield","Effort","aaY","aaE")))
+
+quads<-rbind( 
+       cbind(variable="Green",
+              rbind(data.frame(x=c(-Inf,-Inf,Inf,Inf), y=c(-Inf,  .6,  .6,-Inf), 
+                         fill=as.factor("xgreen")),
+                    data.frame(x=c(-Inf,-Inf,Inf,Inf), y=c(   .6,Inf,Inf,   .6), 
+                         fill=as.factor("xred")))),
+        cbind(variable="Yield",
+              rbind(data.frame(x=c(-Inf,-Inf,Inf,Inf), y=c(-Inf,  .5,  .5,-Inf), 
+                         fill=as.factor("xgreen")),
+                    data.frame(x=c(-Inf,-Inf,Inf,Inf), y=c(   .5,Inf,Inf,   .5), 
+                         fill=as.factor("xred")))),
+        cbind(variable="Effort",
+              rbind(data.frame(x=c(-Inf,-Inf,Inf,Inf), y=c(-Inf,  .5,  .5,-Inf), 
+                         fill=as.factor("xgreen")),
+                    data.frame(x=c(-Inf,-Inf,Inf,Inf), y=c(   .5,Inf,Inf,   .5), 
+                         fill=as.factor("xred")))),
+        cbind(variable="aaY",
+              rbind(data.frame(x=c(-Inf,-Inf,Inf,Inf), y=c(-Inf,  .3,  .3,-Inf), 
+                         fill=as.factor("xred")),
+                    data.frame(x=c(-Inf,-Inf,Inf,Inf), y=c(   .3,Inf,Inf,   .3), 
+                         fill=as.factor("xgreen")))),
+        cbind(variable="aaE",
+              rbind(data.frame(x=c(-Inf,-Inf,Inf,Inf), y=c(-Inf,  .3,  .3,-Inf), 
+                         fill=as.factor("xred")),
+                    data.frame(x=c(-Inf,-Inf,Inf,Inf), y=c(   .3,Inf,Inf,   .3), 
+                         fill=as.factor("xgreen")))))
+ggplot(res2)+
+  geom_polygon(data=quads,aes(x,y,fill=fill)) +
+  geom_point(aes(.5,value,fill=as.factor(OM)),size=3.5,shape=21)+
+  facet_grid(HCR~SA*variable)+
+  scale_fill_manual(values=c(1:8,c("pink","lightgreen")), guide="none") +
+  scale_x_continuous(breaks=NULL,labels="")+
+  scale_y_continuous(limits=c(0,1.1),breaks=c(0,.5,1))+
+  xlab("")+ylab("")
+```
+
+```{r}
+load(file.path(dirNew,"options.RData"))
+load(file.path(dirNew,"design.RData"))
+load(file.path(dirNew,"omKey.RData"))
+load(file.path(dirNew,"priors.RData"))
+load(file.path(dirNew,"trans.RData"))
+load(file.path(dirNew,"res.RData"))
+```
+
+```{r yld}
+ggplot(subset(trans,variable=="yld"))+
+  geom_path(aes(xvar,value,col=factor(OM)))+
+  geom_point(aes(Effort,Yield,col=factor(OM)),data=res)
+```
+
+```{r aav2}
+ggplot(subset(trans,variable=="aav"))+
+  geom_path(aes(xvar,value,col=factor(OM)))+
+  geom_point(aes(Effort,aaY,col=factor(OM)),data=res)
+```
+
+```{r tranf-yld}
+ggplot(subset(trans,variable!="ftar"))+
+  geom_path(aes(xvar,value,col=factor(OM)))+
+  facet_grid(variable~.,scale="free")
+  xlab("Effort")+ylab("")
+
+ggplot(subset(trans,variable=="yld"))+
+  geom_path(aes(xvar,value,col=factor(OM)))+
+  geom_point(aes(Effort,Yield,col=factor(OM)),data=res)+
+  xlab("Effort")+ylab("")
+
+ggplot(subset(trans,variable=="ssb"))+
+  geom_path(aes(xvar,value,col=factor(OM+ar)))+
+  geom_point(aes(Effort,1-Green,col=factor(OM)),data=res)+
+  xlab("Effort")+ylab("")
+```
+
