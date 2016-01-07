@@ -1,3 +1,10 @@
+---
+title: "Tuna MSE Figures"
+author: "Laurie"
+date: "07/01/2016"
+output: word_document
+---
+
 Figures
 ========================================================
 
@@ -27,7 +34,7 @@ library(kobe)
 library(biodyn)
 
 dirOld='/home/laurie/Desktop/MEGA/papers/submitted/tuna-mse/data'
-dirNew='/home/laurie/MEGAsync/papers/tuna-mse/data'
+dirDat='/home/laurie/MEGAsync/papers/tuna-mse/data'
 ```
 
 
@@ -266,8 +273,8 @@ ggplot(op)+
 Design
 ---------------------------------------
 ```{r popPar}
-load(file.path(dirNew,"design.RData"))
-load(file.path(dirNew,"priors.RData"))
+load(file.path(dirDat,"design.RData"))
+load(file.path(dirDat,"priors.RData"))
 
 design.=transform(design, k        =as.integer(as.factor(k)),
                           a50      =as.integer(as.factor(a50)),
@@ -424,13 +431,13 @@ trans=ddply(trans,.(OM,ar,ftar), with,
 ```
 
 ```{r transfer}
-load(file.path(dirNew,"trans.RData"))
-load(file.path(dirNew,"omKey.RData"))
+load(file.path(dirDat,"trans.RData"))
+load(file.path(dirDat,"omKey.RData"))
 
 ggplot(trans)+
-  geom_path(aes(ftar,ageC))+
-  facet_wrap(ar~OM,scale="free")+
-  xlab("")+ylab("")+theme_bw()
+  geom_path(aes(ftar,ageC,col=paste(ar,omKey[ac(OM)])))+
+  xlab("")+ylab("")+theme_bw()+theme(legend.position="bottom")+
+  facet_wrap(ar~omKey[ac(OM)])
 ```
 
 ```{r,eval=FALSE}
@@ -443,8 +450,8 @@ save(spc,file=file.path(dirNew,"spc.RData"))
 ```
 
 ```{r transfer2}
-load(file.path(dirNew,"spc.RData"))
-load(file.path(dirNew,"omKey.RData"))
+load(file.path(dirDat,"spc.RData"))
+load(file.path(dirDat,"omKey.RData"))
 
 spc2=ddply(spc, .(OM,ar,ftar,freq), with, mean(spec))
 spc2=ddply(subset(spc2,freq>0),.(OM,ar,ftar),  transform, V2=V1/max(V1))
@@ -463,7 +470,7 @@ Decision Plot
 ```{r}
 source('~/Desktop/flr/git/diags/R/diags-aav.R')
 
-load(file.path(dirNew,"om.RData"))
+load(file.path(dirDat,"om.RData"))
 
 om =cbind(om,kobe:::kobeP(transform(om,stock=stock,harvest=harvest)))
 om =subset(om,year>=57&year<=101)
@@ -501,11 +508,11 @@ names(res)[11]="aaY"
 res=merge(res,aaE[,c(nms,"V1")])
 names(res)[12]="aaE"
 
-save(res,file=file.path(dirNew,"res.RData"))
+save(res,file=file.path(dirDat,"res.RData"))
 ```
   
 ```{r Smry,echo=FALSE}
-load(file.path(dirNew,"res.RData"))
+load(file.path(dirDat,"res.RData"))
 
 res=melt(res,id=nms)
 res=transform(res,
@@ -538,7 +545,7 @@ quads<-rbind(
                          fill=as.factor("xred")),
                     data.frame(x=c(-Inf,-Inf,Inf,Inf), y=c(   .3,Inf,Inf,   .3), 
                          fill=as.factor("xgreen")))))
-ggplot(res2)+
+ggplot(res)+
   geom_polygon(data=quads,aes(x,y,fill=fill)) +
   geom_point(aes(.5,value,fill=as.factor(OM)),size=3.5,shape=21)+
   facet_grid(HCR~SA*variable)+
@@ -548,41 +555,39 @@ ggplot(res2)+
   xlab("")+ylab("")
 ```
 
-```{r}
-load(file.path(dirNew,"options.RData"))
-load(file.path(dirNew,"design.RData"))
-load(file.path(dirNew,"omKey.RData"))
-load(file.path(dirNew,"priors.RData"))
-load(file.path(dirNew,"trans.RData"))
-load(file.path(dirNew,"res.RData"))
-```
-
 ```{r yld}
-ggplot(subset(trans,variable=="yld"))+
-  geom_path(aes(xvar,value,col=factor(OM)))+
-  geom_point(aes(Effort,Yield,col=factor(OM)),data=res)
+dirDat="/home/laurie/MEGAsync/papers/tuna-mse/data"
+load(file.path(dirDat,"options.RData"))
+load(file.path(dirDat,"design.RData"))
+load(file.path(dirDat,"omKey.RData"))
+load(file.path(dirDat,"priors.RData"))
+load(file.path(dirDat,"trans.RData"))
+load(file.path(dirDat,"res.RData"))
+
+ggplot(trans)+
+  geom_path( aes(ftar,  Yield,col=factor(ar)))+
+  geom_point(aes(Effort,Yield,col=boundTac),data=res)+
+  facet_wrap(~OM)
 ```
 
 ```{r aav2}
-ggplot(subset(trans,variable=="aav"))+
-  geom_path(aes(xvar,value,col=factor(OM)))+
-  geom_point(aes(Effort,aaY,col=factor(OM)),data=res)
+ggplot(trans)+
+  geom_path( aes(ftar,  aaY,col=factor(ar)))+
+  geom_point(aes(Effort,aaY,col=boundTac),data=res)+
+  facet_wrap(~OM)
 ```
 
-```{r tranf-yld}
-ggplot(subset(trans,variable!="ftar"))+
-  geom_path(aes(xvar,value,col=factor(OM)))+
-  facet_grid(variable~.,scale="free")
-  xlab("Effort")+ylab("")
+```{r aav3}
+ggplot(trans)+
+  geom_path( aes(ftar,  aaF,col=factor(ar)))+
+  geom_point(aes(Effort,aaE,col=boundTac),data=res)+
+  facet_wrap(~OM)
+```
 
-ggplot(subset(trans,variable=="yld"))+
-  geom_path(aes(xvar,value,col=factor(OM)))+
-  geom_point(aes(Effort,Yield,col=factor(OM)),data=res)+
-  xlab("Effort")+ylab("")
-
-ggplot(subset(trans,variable=="ssb"))+
-  geom_path(aes(xvar,value,col=factor(OM+ar)))+
-  geom_point(aes(Effort,1-Green,col=factor(OM)),data=res)+
-  xlab("Effort")+ylab("")
+```{r ssb}
+ggplot(trans)+
+  geom_path( aes(ftar,  Green,col=factor(ar)))+
+  geom_point(aes(Effort,Green,col=boundTac),data=res)+
+  facet_wrap(~OM)
 ```
 
