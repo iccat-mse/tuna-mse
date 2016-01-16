@@ -2,64 +2,34 @@ library(FLCore)
 library(FLBRP)
 library(FLash)
 library(biodyn)
-library(FLife)
 library(ggplotFL)
 
 library(RSQLite)
 library(DBI)
 
-#source('/home/laurie/Desktop/flr/git/biodyn/R/biodyn-proj.R')
-#source('/home/laurie/Desktop/flr/git/biodyn/R/biodyn-control.R')
-#source('/home/laurie/Desktop/flr/git/biodyn/R/biodyn-coerce.R')
-
 dirDat='~/Desktop/MEGA/papers/submitted/tuna-mse/data'
-dirRes='~/Desktop/MEGA/papers/submitted/tuna-mse/resubmission/data'
-
-db    =file.path(dirRes,"bndTac.db")
+db    =file.path(dirDat,"mseTest.db")
 
 ##Data sets
-# The design grid for all interactions to set up FLBRP
+# The design grid for all interactions
 load(paste(dirDat,"/design.RData",   sep=""))
+
 # FLBRPs and FLStocks based on design
 load(paste(dirDat,"/OMs.RData",      sep=""))
 load(paste(dirDat,"/BRPs.RData",     sep=""))
+
 # Priors for biodyn based on design
 load(paste(dirDat,"/priors.RData",   sep=""))
 
-## MSE OMs to run
-# Key to identify main effects to run from design
-load(paste(dirDat,"/omKey.RData",    sep=""))
-
-## OM
-options=list(OM =rbind(data.frame(i=as.numeric(names(omKey)),ar=0.0),
-                       data.frame(i=21,                      ar=0.5),
-                       data.frame(i=21,                      ar=rep(0.0,2))))
-
-## HCRs
-options$HCR =expand.grid(ftar=c(.5,.75),blim=c(.3,.4),btrig=c(0.6,0.8))
-
-## SA
-options$SA =rbind(data.frame(p=1,prr=c("None","r","k","fmsy","bmsy"),stringsAsFactors=FALSE),
-                  data.frame(p=2,prr=c("None","r","k","fmsy"),       stringsAsFactors=FALSE))
-
-## OEM for CPUE
-options$OEM =data.frame(omega=c(rep(1,2),.75),qTrend=c(0,.02,0))
-
-save(options,file=file.path(dirRes,"options.RData"))
+## OM Scenarios
+options=list(OM =expand.grid(OM=seq(128),ar=c(0.0,0.5)),
+             HCR=expand.grid(ftar=c(.5,.75),blim=c(.3,.4),btrig=c(0.6,0.8)),
+             SA =expand.grid(p=c(1,2),prr=c("None","r","k","fmsy","bmsy"),stringsAsFactors=FALSE),
+             OEM=expand.grid(omega=c(1,.75),qTrend=c(0,.02)))
 
 
-# Missing runs for resubmission
-load(paste(dirRes,"/newScen.RData",  sep=""))
-newScen=data.frame(iOM=21,newScen)[,c(2,1,3:8)]
-newScen=data.frame(newScen,options$OEM[c(rep(1,16),rep(2,16),rep(3,16)),])
-names(newScen)[3]="iSA"
-newScen=data.frame(newScen,iHCR=1:4)[,c(1:3,11,4:10)]
-oldScen=data.frame(Var1=rep(1:16,8),Var2=rep(1:8,each=16))
-oldScen=cbind(newScen[oldScen$Var1,-c(1:2,9)],options$OM[2:9,][oldScen$Var2,])
-names(oldScen)[9]="iOM"
-oldScen=oldScen[,c("iOM","iSA","iHCR","ftar","blim","btrig","qTrend","omega","ar")]
-
-start=50; end=100; interval=3; rcvPeriod=3
+## Range and iters
+start=50; end=150; interval=3; rcvPeriod=3
 nits =100; seed=7890 
 
 set.seed(seed)
@@ -72,59 +42,36 @@ srDev[["0.5"]]   =exp(lh:::noise(nits, FLQuant(0,dimnames=list(year=1:(end+inter
 
 uDev   =rlnorm(nits,FLQuant(0,dimnames=list(year=1:end)),0.3)
 
-##OM with perfect management
-mou=FLStocks(mlply(options$OM, function(i,ar)
-                biodyn:::proj(OMs[[i]],BRPs[[i]],srDev[[ac(ar)]])))
+scen=do.call("expand.grid",llply(options,function(x) seq(length(dimnames(x)[[1]]))))
+names(scen)=paste("i",names(scen),sep="")
 
-save(mou,file=paste(dirRes,"mou.RData",sep="/"))
+m_ply(subset(scen,(iOM%in%c(21,5,17,22,23,29,53,85)[1]))[1,], 
+      function(iOM,iSA,iHCR,iOEM){
 
-#dataPoorMSE=function(om,eql,srD,pr,
-#                      start=50, end =100,interval=3,
-#                      nits =100,seed=7890,
-#                      uCV=0.3,
-#                      omega =1,
-#                      trendQ=FLQuant(1,dimnames=list(year=1:end)),
-#                      db=NULL){
-
-oms=list()
-m_ply(subset(oldScen,iOM%in%c(85,53)),function(iOM,iSA,iHCR,ftar,blim,btrig,p,ar,omega,qTrend){
-
-  tag=paste(iOM,ar,ftar)
-  
-  start=50; end=100; interval=3; rcvPeriod=3
-  nits =100; seed=7890 
-  
-  eql=BRPs[[iOM]]
-  srD=srDev[[ac(ar)]]
+  eql=BRPs[[options$OM[iOM,"OM"]]]
+  srD=srDev[[ac(options$OM[iOM,"ar"])]]
 
   #### OM
-  if (tag%in%names(oms)){
-    om=oms[[tag]]
-  }else{
-    om =OMs[[iOM]]
-    if (dims(om)$maxyear < end+interval)
-      om =fwdWindow(om,end=end+interval,eql)
+  om=OMs[[options$OM[iOM,"OM"]]]
+  om=fwdWindow(om,end=end+interval,eql)
     
-    ## F in recovery period
-    rcv.=seq(c(fbar(om)[,ac(start)]),c(FLBRP:::refpts(eql)["msy","harvest"])*ftar,length.out=rcvPeriod+1)
-    rcv =FLQuant(rcv.,dimnames=dimnames(fbar(om)[,ac(start+0:rcvPeriod)]))
-    om  =FLash:::fwd(om,f=rcv, sr=eql)
+  ## F in recovery period
+  rcv.=seq(c(fbar(om)[,ac(start)]),c(FLBRP:::refpts(eql)["msy","harvest"])*options$HCR[iHCR,"ftar"],length.out=rcvPeriod+1)
+  rcv =FLQuant(rcv.,dimnames=dimnames(fbar(om)[,ac(start+0:rcvPeriod)]))
+  om  =FLash:::fwd(om,f=rcv, sr=eql)
     
-    ## F in longterm
-    lgt =propagate(FLQuant(rcv.[rcvPeriod+1],dimnames=list(year=(start+rcvPeriod+1):(end+interval))),nits)
-    om  =propagate(om,nits)
-    om  =FLash:::fwd(om,f=lgt, sr=eql)
+  ## F in longterm
+  lgt =propagate(FLQuant(rcv.[rcvPeriod+1],dimnames=list(year=(start+rcvPeriod+1):(end+interval))),nits)
+  om  =propagate(om,nits)
+  om  =FLash:::fwd(om,f=lgt, sr=eql)
     
-    ## Add stochastcity
-    om =FLash:::fwd(om,f =rlnorm(nits,log(fbar(FLCore:::iter(om,1))[,ac(2:(end+interval))]),0.1),
-                    sr=eql,
-                    sr.residuals=srD)
-    oms[[tag]]=om
-    }
-  
+  ## Add stochastcity
+  om =FLash:::fwd(om,f =rlnorm(nits,log(fbar(FLCore:::iter(om,1))[,ac(2:(end+interval))]),0.1),
+                     sr=eql,sr.residuals=srD)
+
   ## save projection for comparison later
   mou=om
-  trendQ=FLQuant(c(rep(1,start-1),cumprod(rep(1+qTrend,end-start+1))),
+  trendQ=FLQuant(c(rep(1,start-1),cumprod(rep(1+options$OEM[iOEM,"qTrend"],end-start+1))),
                  dimnames=list(year=1:end))
 
   #### MP
@@ -143,12 +90,13 @@ m_ply(subset(oldScen,iOM%in%c(85,53)),function(iOM,iSA,iHCR,ftar,blim,btrig,p,ar
              list(om,eql=eql,srDev=srD,
                   control=ctrl,priors=prs,
                   start=start+rcvPeriod,end=end,interval=3,
-                  ftar=ftar,blim=blim,btrig=btrig,
+                  ftar=options$HCR[iHCR,"ftar"],
+                  blim=options$HCR[iHCR,"blim"],
+                  btrig=options$HCR[iHCR,"btrig"],
                   uDev  =uDev,
-                  trendQ=trendQ,
-                  omega =omega,
+                  qTrend=trendQ,
+                  omega =options$OEM[iOEM,"omega"],
                   maxF  =1,
-                  bndTac=c(0.8,1.2),                 
                   refB=FLBRP:::refpts(eql)["msy","biomass"]))
   
   #### Save results
@@ -158,42 +106,13 @@ m_ply(subset(oldScen,iOM%in%c(85,53)),function(iOM,iSA,iHCR,ftar,blim,btrig,p,ar
   mou=cbind(OM=iOM,SA=iSA,HCR=iHCR,omega=omega,qTrend=qTrend,biodyn:::tseries(res$mou,eql))
   om =cbind(OM=iOM,SA=iSA,HCR=iHCR,omega=omega,qTrend=qTrend,biodyn:::tseries(res$om, eql))
   mp =cbind(OM=iOM,SA=iSA,HCR=iHCR,omega=omega,qTrend=qTrend,res$mp)
-  #oem=cbind(OM=iOM,SA=iSA,HCR=iHCR,model.frame(res$oem,drop=T))
     
   dbWriteTable(con, "mou", mou,append=TRUE)
   dbWriteTable(con, "om",  om, append=TRUE)
   dbWriteTable(con, "mp",  mp, append=TRUE)
-  #dbWriteTable(con, "oem", oem,append=TRUE)
   
   dbDisconnect(con)})
 
 drv=dbDriver("SQLite")
 con=dbConnect(drv, dbname=db)
 om =dbReadTable(con, "om")
-
-db2="/home/laurie/Desktop/MEGA/papers/submitted/tuna-mse/resubmission/data/non21.db"
-db3="/home/laurie/Desktop/MEGA/papers/submitted/tuna-mse/data/breakIt"
-db4="/home/laurie/Desktop/MEGA/papers/submitted/tuna-mse/data/breakIt2"
-db5="/home/laurie/Desktop/MEGA/papers/submitted/tuna-mse/data/breakIt6"
-
-con2=dbConnect(drv, dbname=db2)
-con3=dbConnect(drv, dbname=db3)
-con4=dbConnect(drv, dbname=db4)
-con5=dbConnect(drv, dbname=db5)
-
-om2=dbReadTable(con2, "om")
-om3=dbReadTable(con2, "om")
-om4=dbReadTable(con2, "om")
-om5=dbReadTable(con2, "om")
-om=rbind(om2,om3,om4,om5)
-
-ggplot(subset(om,year>55))+
-  geom_boxplot(aes(x=factor(year),y=harvest))+
-  facet_grid(HCR~SA)
-
-ggplot(subset(om2,year>55&OM==5))+
-  geom_boxplot(aes(x=factor(year),y=harvest))+
-  facet_grid(HCR~SA)
-
-ggplot(bc)+
-  geom_boxplot(aes(x=factor(year),y=ssb))

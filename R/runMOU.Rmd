@@ -45,13 +45,6 @@ load(file.path(dirNew,"/OMs.RData"))
 load(file.path(dirNew,"/BRPs.RData"))
 load(file.path(dirNew,"/omKey.RData"))
 
-## OMs & HCRs
-options=list(OM =expand.grid(iOM=1:128,ar=c(0.0,0.5)),
-             HCR=expand.grid(ftar=seq(0,2.5,0.1)))
-
-scen=expand.grid(iOM=seq(dim(options$OM)[1]),iF=seq(dim(options$HCR)[1]))
-scen=with(scen,cbind(options$OM[iOM,],options$HCR[iF,]))
-
 ## Years and Iters
 start=50; end=150; interval=3; rcvPeriod=3
 nits =1000; seed=7890 
@@ -64,7 +57,15 @@ srDev=FLQuants("0"=exp(lh:::noise(nits,flq,b=0,sd=.3)))
 set.seed(seed)
 srDev[["0.5"]]   =exp(lh:::noise(nits,flq,b=0.3,sd=0.5))
 
-m_ply(subset(scen,OM%in%c(21,5,17,22,23,29,53,85))function(iOM,ar,ftar){
+
+## OMs & HCRs
+options=list(OM =expand.grid(iOM=1:128,ar=c(0.0,0.5)),
+             HCR=expand.grid(ftar=c(0.7,1.0,1.3)))
+
+scen=expand.grid(iOM=seq(dim(options$OM)[1]),iF=seq(dim(options$HCR)[1]))
+scen=with(scen,cbind(options$OM[iOM,],ftar=options$HCR[iF,]))
+
+m_ply(scen[!(scen$iOM%in%c(21,5,17,22,23,29,53,85)),], function(iOM,ar,ftar){
   
   eql=BRPs[[iOM]]
   srD=srDev[[ac(ar)]]
