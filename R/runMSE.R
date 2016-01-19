@@ -20,6 +20,7 @@ load(paste(dirDat,"/BRPs.RData",     sep=""))
 
 # Priors for biodyn based on design
 load(paste(dirDat,"/priors.RData",   sep=""))
+priors=priors[, dimnames(biodyn()@priors)$params]
 
 ## OM Scenarios
 options=list(OM =expand.grid(OM=seq(128),ar=c(0.0,0.5)),
@@ -29,7 +30,7 @@ options=list(OM =expand.grid(OM=seq(128),ar=c(0.0,0.5)),
 
 
 ## Range and iters
-start=50; end=120; interval=3; rcvPeriod=3
+start=50; end=1500; interval=3; rcvPeriod=3
 nits =100; seed=7890 
 
 set.seed(seed)
@@ -82,7 +83,7 @@ m_ply(subset(scen,(iOM%in%c(21,5,17,22,23,29,53,85)[1]))[1,],
   ## SA Priors
   prArg=data.frame(a=unlist(c(priors[iOM,])),b=unlist(c(priors[iOM,]))*0.5,weight=1)
   prArg=alply(prArg,1,cbind)
-  names(prArg)=names(priors[iOM,-1])
+  names(prArg)=names(priors[iOM,])
   prs=do.call(priorFn,prArg[options$SA[iSA,2]])
   
   #### MSE
