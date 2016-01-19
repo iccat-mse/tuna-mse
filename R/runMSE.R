@@ -76,7 +76,7 @@ m_ply(subset(scen,(iOM%in%c(21,5,17,22,23,29,53,85)[1]))[1,],
 
   #### MP
   ## SA Control
-  ctrl=with(priors[iSA,],biodyn:::controlFn(r=r,k=k,p=p,b0=b0))
+  ctrl=with(priors[iOM,],biodyn:::controlFn(r=r,k=k,p=p,b0=b0))
   if (options$SA[ iSA, "p"]==1) ctrl["p","val"]=1
   
   ## SA Priors
