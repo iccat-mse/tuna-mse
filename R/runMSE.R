@@ -29,7 +29,7 @@ options=list(OM =expand.grid(OM=seq(128),ar=c(0.0,0.5)),
 
 
 ## Range and iters
-start=50; end=150; interval=3; rcvPeriod=3
+start=50; end=120; interval=3; rcvPeriod=3
 nits =100; seed=7890 
 
 set.seed(seed)
@@ -103,9 +103,9 @@ m_ply(subset(scen,(iOM%in%c(21,5,17,22,23,29,53,85)[1]))[1,],
   drv=dbDriver("SQLite")
   con=dbConnect(drv, dbname=db)
     
-  mou=cbind(OM=iOM,SA=iSA,HCR=iHCR,omega=omega,qTrend=qTrend,biodyn:::tseries(res$mou,eql))
-  om =cbind(OM=iOM,SA=iSA,HCR=iHCR,omega=omega,qTrend=qTrend,biodyn:::tseries(res$om, eql))
-  mp =cbind(OM=iOM,SA=iSA,HCR=iHCR,omega=omega,qTrend=qTrend,res$mp)
+  mou=cbind(OM=iOM,SA=iSA,HCR=iHCR,OEM=iOEM,biodyn:::tseries(res$mou,eql))
+  om =cbind(OM=iOM,SA=iSA,HCR=iHCR,OEM=iOEM,biodyn:::tseries(res$om, eql))
+  mp =cbind(OM=iOM,SA=iSA,HCR=iHCR,OEM=iOEM,res$mp)
     
   dbWriteTable(con, "mou", mou,append=TRUE)
   dbWriteTable(con, "om",  om, append=TRUE)
